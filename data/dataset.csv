@@ -1,0 +1,584 @@
+Key,Puzzle,Code,Solution
+f51c0d33c204e7fdeb1f5d1a934d517e,"Story:
+Match each auctioned spider specimen to its owner and country of origin, and determine the final price paid for each. Remember, as with all grid-based logic puzzles, no option in any category will ever be used more than once.  If you get stuck or run into problems, try the ""Clear Errors"" button to remove any mistakes that might be present on the grid, or the ""Hint"" button to see the next logical step in the puzzle.
+
+Clues:
+1.Freddie's purchase cost 15 dollars more than the cart spider.
+2.Of the darkback and the cart spider, one sold for $60 and the other was won by Vicky.
+3.Of the spider that sold for $75 and Shelley's purchase, one was the archaenido and the other was the cart spider.
+4.The arachnid that sold for $90 was either Shelley's purchase or the darkback.
+
+Solve the grid puzzle by filling the table:
++----------+-----------+-----------+
+| Prices   | Winners   | Spiders   |
++==========+===========+===========+
+| $45      |           |           |
++----------+-----------+-----------+
+| $60      |           |           |
++----------+-----------+-----------+
+| $75      |           |           |
++----------+-----------+-----------+
+| $90      |           |           |
++----------+-----------+-----------+
+
+Use the clues to fill the table with the following categories:
+Winners: Charles, Freddie, Shelley, Vicky
+Spiders: archaenido, cart spider, darkback, whip spider","% ============================================================
+% Spider Auction grid puzzle - ASP (clingo) encoding
+% ============================================================
+
+% ---- Domains ----
+prices(45;60;75;90).
+winners(charles;freddie;shelley;vicky).
+spiders(archaenido;cart_spider;darkback;whip_spider).
+
+% ---- Assignment: each price gets exactly one winner, and vice versa ----
+1 { assign_winner(P,W) : winners(W) } 1 :- prices(P).
+1 { assign_winner(P,W) : prices(P) } 1 :- winners(W).
+
+% ---- Assignment: each price gets exactly one spider, and vice versa ----
+1 { assign_spider(P,S) : spiders(S) } 1 :- prices(P).
+1 { assign_spider(P,S) : prices(P) } 1 :- spiders(S).
+
+% ============================================================
+% Clues
+% ============================================================
+
+% Clue 1: Freddie's purchase cost 15 dollars more than the cart spider.
+% Find the price Freddie paid (P_freddie) and the price of the cart spider (P_cart).
+% Then P_freddie must be P_cart + 15.
+:- assign_winner(P_freddie, freddie),
+   assign_spider(P_cart, cart_spider),
+   P_freddie != P_cart + 15.
+
+% Clue 2: Of the darkback and the cart spider, one sold for $60 and the other was won by Vicky.
+% This means:
+% (darkback sold for $60 AND cart_spider was Vicky's purchase) OR
+% (cart_spider sold for $60 AND darkback was Vicky's purchase)
+% We need to ensure that at least one of these two scenarios is true.
+scenario2_option1 :- assign_spider(60, darkback), assign_winner(P_vicky, vicky), assign_spider(P_vicky, cart_spider).
+scenario2_option2 :- assign_spider(60, cart_spider), assign_winner(P_vicky, vicky), assign_spider(P_vicky, darkback).
+:- not scenario2_option1, not scenario2_option2.
+
+% Clue 3: Of the spider that sold for $75 and Shelley's purchase, one was the archaenido and the other was the cart spider.
+% This means:
+% (archaenido sold for $75 AND cart_spider was Shelley's purchase) OR
+% (cart_spider sold for $75 AND archaenido was Shelley's purchase)
+% We need to ensure that at least one of these two scenarios is true.
+scenario3_option1 :- assign_spider(75, archaenido), assign_winner(P_shelley, shelley), assign_spider(P_shelley, cart_spider).
+scenario3_option2 :- assign_spider(75, cart_spider), assign_winner(P_shelley, shelley), assign_spider(P_shelley, archaenido).
+:- not scenario3_option1, not scenario3_option2.
+
+% Clue 4: The arachnid that sold for $90 was either Shelley's purchase or the darkback.
+% Find the spider that sold for $90 (S_ninety) and the spider Shelley bought (S_shelley).
+% S_ninety must be equal to S_shelley OR S_ninety must be darkback.
+:- assign_spider(90, S_ninety),
+   assign_winner(P_shelley, shelley),
+   assign_spider(P_shelley, S_shelley),
+   S_ninety != S_shelley,
+   S_ninety != darkback.
+
+% ============================================================
+% Output
+% ============================================================
+#show assign_winner/2.
+#show assign_spider/2.","[('45', 'charles'), ('75', 'freddie'), ('60', 'shelley'), ('90', 'vicky'), ('75', 'archaenido'), ('60', 'cart_spider'), ('90', 'darkback'), ('45', 'whip_spider')]"
+08e3c937b0b979a9abe1eab5aa049fdc,"Story:
+Garrett County has set up a number of successful mobile libraries known as ""Bookmobiles"".  Using only the clues below, match each Bookmobile to its driver and vehicle type, and determine the told number of books in each. Remember, as with all grid-based logic puzzles, no option in any category will ever be used more than once.  If you get stuck or run into problems, try the ""Clear Errors"" button to remove any mistakes that might be present on the grid, or the ""Hint"" button to see the next logical step in the puzzle.
+
+Clues:
+1.""Tiny Tomes"" has 350 books.
+2.The mobile library with 300 books is driven by Leroy.
+3.The four vehicles are the bookmobile with 400 books, the vehicle Gene drives, ""Explore More"" and ""Tiny Tomes"".
+4.The mobile library Patsy drives is either the bookmobile with 300 books or ""Books-4-U"".
+
+Solve the grid puzzle by filling the table:
++---------+---------------+-----------+
+|   Books | Bookmobiles   | Drivers   |
++=========+===============+===========+
+|     250 |               |           |
++---------+---------------+-----------+
+|     300 |               |           |
++---------+---------------+-----------+
+|     350 |               |           |
++---------+---------------+-----------+
+|     400 |               |           |
++---------+---------------+-----------+
+
+Use the clues to fill the table with the following categories:
+Bookmobiles: Books-4-U, Dream Machine, Explore More, Tiny Tomes
+Drivers: Antonio, Gene, Leroy, Patsy","% ============================================================
+% Garrett County Bookmobiles grid puzzle - ASP (clingo) encoding
+% ============================================================
+
+% ---- Domains ----
+books(250;300;350;400).
+bookmobiles(books_4_u;dream_machine;explore_more;tiny_tomes).
+drivers(antonio;gene;leroy;patsy).
+
+% ---- Assignment: each books value gets exactly one bookmobile, and vice versa ----
+% bookmobile(Books, BookmobileName)
+1 { bookmobile(B, BM) : bookmobiles(BM) } 1 :- books(B).
+1 { bookmobile(B, BM) : books(B) } 1 :- bookmobiles(BM).
+
+% ---- Assignment: each books value gets exactly one driver, and vice versa ----
+% driver(Books, DriverName)
+1 { driver(B, D) : drivers(D) } 1 :- books(B).
+1 { driver(B, D) : books(B) } 1 :- drivers(D).
+
+% ============================================================
+% Clues
+% ============================================================
+
+% Clue 1: ""Tiny Tomes"" has 350 books.
+:- bookmobile(B, tiny_tomes), B != 350.
+:- bookmobile(350, BM), BM != tiny_tomes.
+
+% Clue 2: The mobile library with 300 books is driven by Leroy.
+:- driver(B, leroy), B != 300.
+:- driver(300, D), D != leroy.
+
+% Clue 3: The four vehicles are the bookmobile with 400 books, the vehicle Gene drives, ""Explore More"" and ""Tiny Tomes"".
+% This implies that these four descriptions refer to four distinct bookmobiles.
+% Since there are exactly four bookmobiles in total, this means the set of all bookmobiles is precisely these four.
+%
+% 1. The bookmobile with 400 books is not ""Explore More"".
+:- bookmobile(400, explore_more).
+% 2. The bookmobile with 400 books is not ""Tiny Tomes"". (This is already implied by Clue 1, as Tiny Tomes has 350 books).
+%
+% 3. The bookmobile Gene drives is not ""Explore More"".
+:- driver(B, gene), bookmobile(B, explore_more).
+% 4. The bookmobile Gene drives is not ""Tiny Tomes"". (If Gene drives Tiny Tomes, then Tiny Tomes would be listed twice
+%    in the set of four distinct bookmobiles. Since Tiny Tomes has 350 books (Clue 1), Gene cannot drive the 350-book bookmobile).
+:- driver(350, gene).
+%
+% 5. The bookmobile with 400 books is not the bookmobile Gene drives.
+%    This means Gene does not drive the bookmobile with 400 books.
+:- driver(400, gene).
+
+% Clue 4: The mobile library Patsy drives is either the bookmobile with 300 books or ""Books-4-U"".
+% If Patsy drives a bookmobile with B books, then (B=300 OR that bookmobile is 'books_4_u').
+:- driver(B, patsy), B != 300, bookmobile(B, BM), BM != books_4_u.
+
+% ============================================================
+% Output
+% ============================================================
+#show bookmobile/2.
+#show driver/2.","[('400', 'books_4_u'), ('250', 'dream_machine'), ('300', 'explore_more'), ('350', 'tiny_tomes'), ('350', 'antonio'), ('250', 'gene'), ('300', 'leroy'), ('400', 'patsy')]"
+a996b44da7d0cfe5fd1d3ae42a63031b,"Story:
+The Appalachian Folk Art Festival's woodcarving competition attracted master carvers from throughout the mountain region. Judge Walter Oakes, himself a renowned wildlife sculptor, examined each entry's detail work and artistic interpretation. Determine the height of each carving, the type of wood used, the subject matter, and the carver who created it. Remember, as with all grid-based logic puzzles, no option in any category will ever be used more than once.  If you get stuck or run into problems, try the ""Clear Errors"" button to remove any mistakes that might be present on the grid, or the ""Hint"" button to see the next logical step in the puzzle.
+
+Clues:
+1.The four carvings were the wolf piece, the 12 inch carving, the 8 inch piece and the 20 inch sculpture.
+2.The 20 inch piece is an eagle.
+3.The cherry piece is 8 inches taller than the mahogany sculpture.
+4.The butternut piece is 4 inches shorter than the deer carving.
+
+Solve the grid puzzle by filling the table:
++-----------+--------------+------------+
+| Heights   | Wood Types   | Subjects   |
++===========+==============+============+
+| 8 inches  |              |            |
++-----------+--------------+------------+
+| 12 inches |              |            |
++-----------+--------------+------------+
+| 16 inches |              |            |
++-----------+--------------+------------+
+| 20 inches |              |            |
++-----------+--------------+------------+
+
+Use the clues to fill the table with the following categories:
+Wood Types: butternut, cherry, mahogany, pine
+Subjects: deer, eagle, fish, wolf","% ============================================================
+% Appalachian Folk Art Festival woodcarving competition - ASP (clingo) encoding
+% ============================================================
+
+% ---- Domains ----
+heights(8;12;16;20).
+wood_types(butternut;cherry;mahogany;pine).
+subjects(deer;eagle;fish;wolf).
+
+% ---- Assignment: each height gets exactly one wood type, and vice versa ----
+1 { wood(H,W) : wood_types(W) } 1 :- heights(H).
+1 { wood(H,W) : heights(H) } 1 :- wood_types(W).
+
+% ---- Assignment: each height gets exactly one subject, and vice versa ----
+1 { subject(H,S) : subjects(S) } 1 :- heights(H).
+1 { subject(H,S) : heights(H) } 1 :- subjects(S).
+
+% ============================================================
+% Clues
+% ============================================================
+
+% Clue 1: The four carvings were the wolf piece, the 12 inch carving,
+%         the 8 inch piece and the 20 inch sculpture.
+% This implies that the wolf piece is distinct from the 8, 12, and 20 inch pieces.
+% Since the four carvings correspond to heights 8, 12, 16, and 20,
+% the wolf piece must be the 16 inch carving.
+:- not subject(16, wolf).
+
+% Clue 2: The 20 inch piece is an eagle.
+:- not subject(20, eagle).
+
+% Clue 3: The cherry piece is 8 inches taller than the mahogany sculpture.
+% This means if H1 is the height of the cherry piece and H2 is the height
+% of the mahogany piece, then H1 = H2 + 8.
+:- wood(H1, cherry), wood(H2, mahogany), H1 != H2 + 8.
+% And such a pair must exist.
+cherry_mahogany_8_taller :- wood(H1, cherry), wood(H2, mahogany), H1 = H2 + 8.
+:- not cherry_mahogany_8_taller.
+
+% Clue 4: The butternut piece is 4 inches shorter than the deer carving.
+% This means if H1 is the height of the butternut piece and H2 is the height
+% of the deer piece, then H1 = H2 - 4.
+:- wood(H1, butternut), subject(H2, deer), H1 != H2 - 4.
+% And such a pair must exist.
+butternut_deer_4_shorter :- wood(H1, butternut), subject(H2, deer), H1 = H2 - 4.
+:- not butternut_deer_4_shorter.
+
+% ============================================================
+% Output
+% ============================================================
+#show wood/2.
+#show subject/2.","[('8', 'butternut'), ('20', 'cherry'), ('12', 'mahogany'), ('16', 'pine'), ('12', 'deer'), ('20', 'eagle'), ('8', 'fish'), ('16', 'wolf')]"
+70043e4797ce188c5dff5e6195703f15,"Story:
+Mary has 42 different grandchildren, and it seems like barely a week goes by when she doesn't have to send out a birthday card!  Help her sort out this month's cards by matching each grandchild to his or her birthday, age and hometown. Remember, as with all grid-based logic puzzles, no option in any category will ever be used more than once.  If you get stuck or run into problems, try the ""Clear Errors"" button to remove any mistakes that might be present on the grid, or the ""Hint"" button to see the next logical step in the puzzle.
+
+Clues:
+1.Guy isn't 9 years old.
+2.Johanna was born on April 11th.
+3.Kerry is 8 years old.
+4.The 14-year-old has a birthday 4 days after Nathaniel.
+5.Nathaniel has a birthday 4 days before Bryan.
+6.The five children are Kerry, the 5-year-old, the grandchild with the April 15th birthday, the grandchild with the April 11th birthday and the child with the April 7th birthday.
+
+Solve the grid puzzle by filling the table:
++-------------+-----------------+--------+
+| Birthdays   | Grandchildren   | Ages   |
++=============+=================+========+
+| April 3rd   |                 |        |
++-------------+-----------------+--------+
+| April 7th   |                 |        |
++-------------+-----------------+--------+
+| April 11th  |                 |        |
++-------------+-----------------+--------+
+| April 15th  |                 |        |
++-------------+-----------------+--------+
+| April 19th  |                 |        |
++-------------+-----------------+--------+
+
+Use the clues to fill the table with the following categories:
+Grandchildren: Bryan, Guy, Johanna, Kerry, Nathaniel
+Ages: 5, 8, 9, 14, 18","% ============================================================
+% Mary's Grandchildren grid puzzle - ASP (clingo) encoding
+% ============================================================
+
+% ---- Domains ----
+birthdays(april_3rd;april_7th;april_11th;april_15th;april_19th).
+grandchildren(bryan;guy;johanna;kerry;nathaniel).
+ages(5;8;9;14;18).
+
+% ""X days after"" relation over the timeline
+% This is a bit tricky since the days are not consecutive.
+% We need to define the specific differences.
+% For 4 days after:
+days_after(april_3rd, april_7th, 4).
+days_after(april_7th, april_11th, 4).
+days_after(april_11th, april_15th, 4).
+days_after(april_15th, april_19th, 4).
+
+% ---- Assignment: each birthday gets exactly one grandchild, and vice versa ----
+1 { grandchild(B,G) : grandchildren(G) } 1 :- birthdays(B).
+1 { grandchild(B,G) : birthdays(B) } 1 :- grandchildren(G).
+
+% ---- Assignment: each birthday gets exactly one age, and vice versa ----
+1 { age(B,A) : ages(A) } 1 :- birthdays(B).
+1 { age(B,A) : birthdays(B) } 1 :- ages(A).
+
+% ============================================================
+% Clues
+% ============================================================
+
+% Clue 1: Guy isn't 9 years old.
+:- grandchild(B,guy), age(B,9).
+
+% Clue 2: Johanna was born on April 11th.
+:- grandchild(B,johanna), B != april_11th.
+
+% Clue 3: Kerry is 8 years old.
+:- grandchild(B,kerry), age(B,A), A != 8.
+
+% Clue 4: The 14-year-old has a birthday 4 days after Nathaniel.
+:- age(B1,14), grandchild(B2,nathaniel), not days_after(B2,B1,4).
+
+% Clue 5: Nathaniel has a birthday 4 days before Bryan.
+% This means Bryan's birthday is 4 days after Nathaniel's.
+:- grandchild(B1,nathaniel), grandchild(B2,bryan), not days_after(B1,B2,4).
+
+% Clue 6: The five children are Kerry, the 5-year-old, the grandchild with the April 15th birthday,
+%         the grandchild with the April 11th birthday and the child with the April 7th birthday.
+% This clue lists all five grandchildren, implying they are distinct.
+% Since we already enforce one-to-one assignments, we just need to ensure consistency.
+% The main implication is that the grandchild who is Kerry, the grandchild who is 5 years old,
+% the grandchild with the April 15th birthday, the grandchild with the April 11th birthday,
+% and the grandchild with the April 7th birthday are all distinct individuals.
+% This is implicitly handled by the one-to-one constraints and the fact that there are 5 distinct categories.
+% We can add constraints to ensure that these descriptions refer to distinct entities if not already guaranteed.
+% For example, Kerry is not the 5-year-old, unless the puzzle allows for that.
+% Given ""no option in any category will ever be used more than once"", these must be distinct.
+
+% Kerry is not the 5-year-old.
+:- grandchild(B,kerry), age(B,5).
+% Kerry is not the grandchild with the April 15th birthday.
+:- grandchild(april_15th,kerry).
+% Kerry is not the grandchild with the April 11th birthday. (Already covered by Clue 2: Johanna is April 11th)
+:- grandchild(april_11th,kerry).
+% Kerry is not the grandchild with the April 7th birthday.
+:- grandchild(april_7th,kerry).
+
+% The 5-year-old is not the grandchild with the April 15th birthday.
+:- age(april_15th,5).
+% The 5-year-old is not the grandchild with the April 11th birthday.
+:- age(april_11th,5).
+% The 5-year-old is not the grandchild with the April 7th birthday.
+:- age(april_7th,5).
+
+% The grandchild with the April 15th birthday is not the grandchild with the April 11th birthday. (Implicitly true by distinct birthdays)
+% The grandchild with the April 15th birthday is not the grandchild with the April 7th birthday. (Implicitly true by distinct birthdays)
+% The grandchild with the April 11th birthday is not the grandchild with the April 7th birthday. (Implicitly true by distinct birthdays)
+
+% Clue 6 also implies that Johanna (April 11th) is not Kerry, not the 5-year-old, etc.
+% Johanna is not Kerry. (This is implicitly handled by the distinct names)
+% Johanna is not the 5-year-old.
+:- grandchild(april_11th,G), age(april_11th,5).
+
+% ============================================================
+% Output
+% ============================================================
+#show grandchild/2.
+#show age/2.","[('april_7th', 'bryan'), ('april_15th', 'guy'), ('april_11th', 'johanna'), ('april_19th', 'kerry'), ('april_3rd', 'nathaniel'), ('april_3rd', '5'), ('april_19th', '8'), ('april_11th', '9'), ('april_7th', '14'), ('april_15th', '18')]"
+504f9d954df699d00ad2e87449c98dc8,"Story:
+Ernest, the curator at the Eastwick Historical Museum, is cataloging a newly acquired set of vintage postcards.  Each postcard depicts a famous city and was mailed to a different town.  Match each postcard to the city it depicts and the person it was addressed to, as well as the town it was mailed to, and determine the year it was sent. Remember, as with all grid-based logic puzzles, no option in any category will ever be used more than once.  If you get stuck or run into problems, try the ""Clear Errors"" button to remove any mistakes that might be present on the grid, or the ""Hint"" button to see the next logical step in the puzzle.
+
+Clues:
+1.The postcard mailed in 1920 wasn't mailed to Dunmore.
+2.The postcard mailed in 1912 wasn't addressed to Ida Shaw.
+3.Of the postcard sent to Fay Morris and the postcard mailed to Fairhaven, one was from New York and the other was posted in 1920.
+4.The postcard from New York was posted in 1928.
+5.Of the postcard mailed to Ashton and the postcard from Cairo, one was addressed to Fay Morris and the other was addressed to Roy Grant.
+6.The postcard from London was mailed sometime after the card mailed to Ashton.
+
+Solve the grid puzzle by filling the table:
++---------+----------+--------------+----------------+
+|   Years | Cities   | Addressees   | Destinations   |
++=========+==========+==============+================+
+|    1904 |          |              |                |
++---------+----------+--------------+----------------+
+|    1912 |          |              |                |
++---------+----------+--------------+----------------+
+|    1920 |          |              |                |
++---------+----------+--------------+----------------+
+|    1928 |          |              |                |
++---------+----------+--------------+----------------+
+
+Use the clues to fill the table with the following categories:
+Cities: Cairo, London, New York, Tokyo
+Addressees: Ada Bell, Fay Morris, Ida Shaw, Roy Grant
+Destinations: Ashton, Dunmore, Elkridge, Fairhaven","% ============================================================
+% Eastwick Historical Museum postcard puzzle - ASP (clingo) encoding
+% ============================================================
+
+% ---- Domains ----
+years(1904;1912;1920;1928).
+cities(cairo;london;new_york;tokyo).
+addressees(ada_bell;fay_morris;ida_shaw;roy_grant).
+destinations(ashton;dunmore;elkridge;fairhaven).
+
+% ""sometime after"" relation over the timeline
+% order(Y1, Y2) means Y1 is before Y2
+order(1904,1912).
+order(1904,1920).
+order(1904,1928).
+order(1912,1920).
+order(1912,1928).
+order(1920,1928).
+
+% ---- Assignment: each year gets exactly one city, and vice versa ----
+1 { city(Y,C) : cities(C) } 1 :- years(Y).
+1 { city(Y,C) : years(Y) } 1 :- cities(C).
+
+% ---- Assignment: each year gets exactly one addressee, and vice versa ----
+1 { addressee(Y,A) : addressees(A) } 1 :- years(Y).
+1 { addressee(Y,A) : years(Y) } 1 :- addressees(A).
+
+% ---- Assignment: each year gets exactly one destination, and vice versa ----
+1 { destination(Y,D) : destinations(D) } 1 :- years(Y).
+1 { destination(Y,D) : years(Y) } 1 :- destinations(D).
+
+% ============================================================
+% Clues
+% ============================================================
+
+% Clue 1: The postcard mailed in 1920 wasn't mailed to Dunmore.
+:- destination(1920, dunmore).
+
+% Clue 2: The postcard mailed in 1912 wasn't addressed to Ida Shaw.
+:- addressee(1912, ida_shaw).
+
+% Clue 3: Of the postcard sent to Fay Morris and the postcard mailed to Fairhaven,
+%         one was from New York and the other was posted in 1920.
+% Let Y1 be the year for Fay Morris, Y2 for Fairhaven. Y1 and Y2 must be distinct.
+% This means (city(Y1, new_york) AND Y2 = 1920) OR (city(Y2, new_york) AND Y1 = 1920).
+
+% First, ensure the two postcards are from different years.
+:- addressee(Y, fay_morris), destination(Y, fairhaven).
+
+% Define the two possible conditions for distinct years Y1, Y2
+clue3_cond1(Y1, Y2) :- addressee(Y1, fay_morris), destination(Y2, fairhaven), city(Y1, new_york), Y2 = 1920.
+clue3_cond2(Y1, Y2) :- addressee(Y1, fay_morris), destination(Y2, fairhaven), city(Y2, new_york), Y1 = 1920.
+
+% Enforce that for distinct Y1, Y2, exactly one of the conditions must be true.
+% It's forbidden if neither condition is true.
+:- addressee(Y1, fay_morris), destination(Y2, fairhaven), Y1 != Y2,
+   not clue3_cond1(Y1, Y2),
+   not clue3_cond2(Y1, Y2).
+% Note: It's impossible for both clue3_cond1 and clue3_cond2 to be true simultaneously
+% due to the unique assignment constraints (e.g., only one year can be 1920, only one year can be New York),
+% so no explicit constraint for ""not both"" is needed.
+
+% Clue 4: The postcard from New York was posted in 1928.
+:- city(Y, new_york), Y != 1928.
+
+% Clue 5: Of the postcard mailed to Ashton and the postcard from Cairo,
+%         one was addressed to Fay Morris and the other was addressed to Roy Grant.
+% Let Y1 be the year for Ashton, Y2 for Cairo. Y1 and Y2 must be distinct.
+% This means (addressee(Y1, fay_morris) AND addressee(Y2, roy_grant)) OR (addressee(Y1, roy_grant) AND addressee(Y2, fay_morris)).
+
+% First, ensure the two postcards are from different years.
+:- destination(Y, ashton), city(Y, cairo).
+
+% Define the two possible conditions for distinct years Y1, Y2
+clue5_cond1(Y1, Y2) :- destination(Y1, ashton), city(Y2, cairo), addressee(Y1, fay_morris), addressee(Y2, roy_grant).
+clue5_cond2(Y1, Y2) :- destination(Y1, ashton), city(Y2, cairo), addressee(Y1, roy_grant), addressee(Y2, fay_morris).
+
+% Enforce that for distinct Y1, Y2, exactly one of the conditions must be true.
+% It's forbidden if neither condition is true.
+:- destination(Y1, ashton), city(Y2, cairo), Y1 != Y2,
+   not clue5_cond1(Y1, Y2),
+   not clue5_cond2(Y1, Y2).
+% Note: Similar to Clue 3, it's impossible for both clue5_cond1 and clue5_cond2 to be true simultaneously
+% due to unique addressee assignments.
+
+% Clue 6: The postcard from London was mailed sometime after the card mailed to Ashton.
+% This means the year of the London postcard is after the year of the Ashton postcard.
+% So, year(Ashton) must be before year(London).
+:- city(Y_london, london), destination(Y_ashton, ashton), not order(Y_ashton, Y_london).
+
+% ============================================================
+% Output
+% ============================================================
+#show city/2.
+#show addressee/2.
+#show destination/2.","[('1920', 'cairo'), ('1912', 'london'), ('1928', 'new_york'), ('1904', 'tokyo'), ('1912', 'ada_bell'), ('1920', 'fay_morris'), ('1928', 'ida_shaw'), ('1904', 'roy_grant'), ('1904', 'ashton'), ('1912', 'dunmore'), ('1920', 'elkridge'), ('1928', 'fairhaven')]"
+d054399c77e80e2d10de3b85df415b5d,"Story:
+The local foodie club met at Chez Martin last night for their monthly meal.  Match each person to their choice of wine and entree, and determine how much each owed at the end of the night. Remember, as with all grid-based logic puzzles, no option in any category will ever be used more than once.  If you get stuck or run into problems, try the ""Clear Errors"" button to remove any mistakes that might be present on the grid, or the ""Hint"" button to see the next logical step in the puzzle.
+
+Clues:
+1.Lynda paid 2 dollars more than the diner who ordered the beef stir-fry.
+2.The diner who ordered the beef stir-fry was either the one who had the merlot or the one who had the bordeaux.
+3.The person who paid $26.99 didn't have the zinfandel.
+4.The one who had the chianti paid 2 dollars less than the diner who ordered the filet mignon.
+5.Of the one who had the merlot and the one who had the chianti, one paid $25.99 and the other ordered the lobster tail.
+6.The diner who ordered the beef stir-fry paid 1 dollar more than Frances.
+7.Neither Willie nor the diner who ordered the beef stir-fry was the person who paid $27.99.
+
+Solve the grid puzzle by filling the table:
++----------+---------+---------+-----------+
+| Prices   | Names   | Wines   | Entrees   |
++==========+=========+=========+===========+
+| $24.99   |         |         |           |
++----------+---------+---------+-----------+
+| $25.99   |         |         |           |
++----------+---------+---------+-----------+
+| $26.99   |         |         |           |
++----------+---------+---------+-----------+
+| $27.99   |         |         |           |
++----------+---------+---------+-----------+
+
+Use the clues to fill the table with the following categories:
+Names: Frances, Genevieve, Lynda, Willie
+Wines: bordeaux, chianti, merlot, zinfandel
+Entrees: beef stir-fry, filet mignon, lobster tail, pork chops","% ============================================================
+% Foodie Club logic grid puzzle - ASP (clingo) encoding
+% ============================================================
+
+% ---- Domains ----
+% Prices are represented as atoms with a 'p' prefix to avoid potential parsing issues with numbers containing underscores.
+prices(p24_99; p25_99; p26_99; p27_99).
+names(frances; genevieve; lynda; willie).
+wines(bordeaux; chianti; merlot; zinfandel).
+entrees(beef_stir_fry; filet_mignon; lobster_tail; pork_chops).
+
+% Define price differences for clues
+% price_diff(P1, P2, D) means P1 is D dollars more than P2
+price_diff(p25_99, p24_99, 1).
+price_diff(p26_99, p25_99, 1).
+price_diff(p27_99, p26_99, 1).
+
+price_diff(p26_99, p24_99, 2).
+price_diff(p27_99, p25_99, 2).
+
+% ---- Assignment: each price gets exactly one name, and vice versa ----
+1 { name(P,N) : names(N) } 1 :- prices(P).
+1 { name(P,N) : prices(P) } 1 :- names(N).
+
+% ---- Assignment: each price gets exactly one wine, and vice versa ----
+1 { wine(P,W) : wines(W) } 1 :- prices(P).
+1 { wine(P,W) : prices(P) } 1 :- wines(W).
+
+% ---- Assignment: each price gets exactly one entree, and vice versa ----
+1 { entree(P,E) : entrees(E) } 1 :- prices(P).
+1 { entree(P,E) : prices(P) } 1 :- entrees(E).
+
+% ============================================================
+% Clues
+% ============================================================
+
+% Clue 1: Lynda paid 2 dollars more than the diner who ordered the beef stir-fry.
+:- name(P1, lynda), entree(P2, beef_stir_fry), not price_diff(P1, P2, 2).
+
+% Clue 2: The diner who ordered the beef stir-fry was either the one who had the merlot or the one who had the bordeaux.
+:- entree(P, beef_stir_fry), not wine(P, merlot), not wine(P, bordeaux).
+
+% Clue 3: The person who paid $26.99 didn't have the zinfandel.
+:- wine(p26_99, zinfandel).
+
+% Clue 4: The one who had the chianti paid 2 dollars less than the diner who ordered the filet mignon.
+% This means the filet mignon diner paid 2 dollars more than the chianti diner.
+:- wine(P1, chianti), entree(P2, filet_mignon), not price_diff(P2, P1, 2).
+
+% Clue 5: Of the one who had the merlot and the one who had the chianti,
+%         one paid $25.99 and the other ordered the lobster tail.
+% Helper predicates for the two possibilities
+clue5_possibility_1(P_merlot, P_chianti) :- P_merlot = p25_99, entree(P_chianti, lobster_tail).
+clue5_possibility_2(P_merlot, P_chianti) :- P_chianti = p25_99, entree(P_merlot, lobster_tail).
+
+% Constraint: one of the possibilities must be true
+:- wine(P_merlot, merlot), wine(P_chianti, chianti), P_merlot != P_chianti,
+   not clue5_possibility_1(P_merlot, P_chianti),
+   not clue5_possibility_2(P_merlot, P_chianti).
+
+% Clue 6: The diner who ordered the beef stir-fry paid 1 dollar more than Frances.
+:- entree(P1, beef_stir_fry), name(P2, frances), not price_diff(P1, P2, 1).
+
+% Clue 7: Neither Willie nor the diner who ordered the beef stir-fry was the person who paid $27.99.
+:- name(p27_99, willie).
+:- entree(p27_99, beef_stir_fry). 
+:- name(P, willie), entree(P, beef_stir_fry).
+
+% ============================================================
+% Output
+% ============================================================
+#show name/2.
+#show wine/2.
+#show entree/2.","[('p24_99', 'frances'), ('p26_99', 'genevieve'), ('p27_99', 'lynda'), ('p25_99', 'willie'), ('p26_99', 'bordeaux'), ('p24_99', 'chianti'), ('p25_99', 'merlot'), ('p27_99', 'zinfandel'), ('p25_99', 'beef_stir_fry'), ('p26_99', 'filet_mignon'), ('p24_99', 'lobster_tail'), ('p27_99', 'pork_chops')]"

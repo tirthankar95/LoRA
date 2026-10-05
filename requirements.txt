@@ -1,0 +1,8 @@
+torch
+transformers
+datasets
+peft
+hydra-core
+omegaconf
+# GPU-only; required for the `query` action and the scripts/vllm_chat_demo.py demo.
+vllm
