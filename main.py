@@ -31,6 +31,7 @@ def main(cfg: DictConfig):
         merged_dir = Path(cfg.save_dir) / "merged_model"
         if not merged_dir.exists():
             logger.warning(f"No merged model found at {merged_dir}.")
+            generate_with_vllm(str(cfg.model_dir), query)
             return
         logger.info(f"Loading model from {merged_dir} with vllm for prompt:\n{query}\n")
         generate_with_vllm(str(merged_dir), query)

@@ -1,5 +1,5 @@
-model_dir: "/Users/tmittra/models/Qwen3-8B-GGUF-Q4"
-action: "query" # Options: "train", "query"
+model_dir: "/home/tmittra/models/Qwen2.5-1.5B-Instruct"
+action: "train" # Options: "train", "query"
 save_dir: "lora_output"
 
 lora:

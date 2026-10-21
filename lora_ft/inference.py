@@ -34,7 +34,7 @@ def _get_engine(model_dir, tokenizer=None):
     return _ENGINE
 
 
-def generate_with_vllm(model_dir, prompt, tokenizer=None, temperature=0.7, max_tokens=2048):
+def generate_with_vllm(model_dir, prompt, tokenizer=None, temperature=0.7, max_tokens=8192):
     """Generate text for ``prompt`` using vLLM, reusing a cached engine."""
     engine = _get_engine(model_dir, tokenizer=tokenizer)
     sampling_params = SamplingParams(max_tokens=max_tokens, temperature=temperature)

@@ -9,11 +9,9 @@ from transformers import (
     AutoModelForCausalLM,
     TrainingArguments,
     Trainer,
-    DataCollatorForLanguageModeling,
 )
 from peft import LoraConfig, get_peft_model
-
-from lora_ft.data import make_train_dataset
+from lora_ft.data import DataCollatorForAnswerOnly, make_train_dataset
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +29,6 @@ def fine_tune_lora(cfg: DictConfig) -> str:
     tokenizer = AutoTokenizer.from_pretrained(cfg.model_dir)
     model = AutoModelForCausalLM.from_pretrained(cfg.model_dir)
     train_dataset = make_train_dataset(tokenizer)
-
     lora_config = LoraConfig(
         r=cfg.lora.r,
         lora_alpha=cfg.lora.lora_alpha,
@@ -42,12 +39,9 @@ def fine_tune_lora(cfg: DictConfig) -> str:
         task_type=cfg.lora.task_type,
     )
     peft_model = get_peft_model(model, lora_config)
-
-    # mlm=False -> autoregressive (causal) LM. The collator pads each batch to
-    # its longest sequence, clones input_ids into labels, and masks padding
-    # tokens as -100 so they are ignored by the loss. This is why the dataset
-    # does not need explicit labels.
-    data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+    # Pad only to the longest sequence in each batch. Prompt and padding tokens
+    # are already marked -100 in labels and therefore do not contribute to loss.
+    data_collator = DataCollatorForAnswerOnly(tokenizer)
     training_args = TrainingArguments(
         output_dir=cfg.train.output_dir,
         num_train_epochs=cfg.train.num_train_epochs,
@@ -64,13 +58,11 @@ def fine_tune_lora(cfg: DictConfig) -> str:
         data_collator=data_collator,
     )
     trainer.train()
-
     # Save the PEFT adapter.
     adapter_dir = Path(cfg.save_dir) / "adapter"
     adapter_dir.mkdir(parents=True, exist_ok=True)
     peft_model.save_pretrained(str(adapter_dir))
     logger.info(f"Saved LoRA adapter to {adapter_dir}")
-
     # Merge the adapter into the base weights and save a standalone model that
     # vLLM can load directly.
     merged_dir = Path(cfg.save_dir) / "merged_model"
@@ -86,5 +78,4 @@ def fine_tune_lora(cfg: DictConfig) -> str:
                 "merge_and_unload() not available for this PEFT version. "
                 "Saved adapter only."
             )
-
     return str(adapter_dir)

@@ -1,4 +1,4 @@
-# LoRA fine-tuning for Qwen3-8B-GGUF-Q4
+# LoRA fine-tuning for **MODELS**
 
 Minimal pipeline to LoRA fine-tune a causal LM, merge the adapter into the base
 weights, and query the merged model with [vLLM](https://github.com/vllm-project/vllm).
@@ -11,7 +11,7 @@ weights, and query the merged model with [vLLM](https://github.com/vllm-project/
 ├── configs/
 │   └── config.yaml             # model paths + LoRA/training hyperparameters
 ├── lora_ft/                    # package
-│   ├── data.py                 # toy training dataset builder
+│   ├── data.py                 # ASP puzzle training dataset builder
 │   ├── train.py                # fine_tune_lora(): train, save adapter + merged model
 │   ├── inference.py            # generate_with_vllm(): cached vLLM engine
 │   └── utils.py                # get_module_names(): inspect LoRA target modules
@@ -20,7 +20,7 @@ weights, and query the merged model with [vLLM](https://github.com/vllm-project/
 ├── notebooks/
 │   └── gpu_management.ipynb     # VRAM usage exploration
 ├── data/
-│   └── dataset.csv             # logic-puzzle dataset (not yet wired into training)
+│   └── dataset.csv             # ASP puzzle training data (Puzzle and Code columns)
 └── docs/
     └── qwen2-1.5B-arch.txt      # dumped module names of the Qwen2 architecture
 ```

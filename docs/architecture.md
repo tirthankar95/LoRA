@@ -19,7 +19,7 @@ configs/config.yaml     All runtime knobs: model/save paths, LoRA hyperparams,
 
 lora_ft/                The package.
   data.py               make_train_dataset(tokenizer): builds + tokenizes the
-                        training set. Currently a 2-sample toy dataset.
+                        ASP puzzle training set from data/dataset.csv.
   train.py              fine_tune_lora(cfg): the core workflow (below).
   inference.py          generate_with_vllm(...): one lazily-created, cached
                         vLLM engine reused across calls.
@@ -28,7 +28,7 @@ lora_ft/                The package.
 
 scripts/vllm_chat_demo.py   Standalone chat-template generation demo.
 notebooks/                  VRAM exploration.
-data/dataset.csv            Logic-puzzle set (not yet wired into training).
+data/dataset.csv            ASP puzzle set with Puzzle questions and Code answers.
 docs/                       This file + a dump of the Qwen2 module names.
 ```
 
@@ -41,15 +41,15 @@ config.yaml
 AutoTokenizer / AutoModelForCausalLM.from_pretrained(model_dir)
     │
     ▼
-make_train_dataset(tokenizer)            # text -> input_ids (truncate @ 512)
+make_train_dataset(tokenizer)            # tokenize without padding; mask Puzzle labels
     │
     ▼
 get_peft_model(model, LoraConfig)        # inject LoRA adapters into attn proj
     │
     ▼
-Trainer(... DataCollatorForLanguageModeling(mlm=False) ...).train()
-    │                                    # dynamic padding; labels = input_ids,
-    │                                    # pad tokens masked to -100
+Trainer(... DataCollatorForAnswerOnly(tokenizer) ...).train()
+    │                                    # pad per batch; ignore question and pad
+    │                                    # positions in loss with labels = -100
     ▼
 save adapter  ->  save_dir/adapter/
 merge_and_unload()  ->  save_dir/merged_model/   # standalone weights for vLLM
